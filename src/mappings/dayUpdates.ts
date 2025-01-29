@@ -1,32 +1,32 @@
 /* eslint-disable prefer-const */
 import { BigDecimal, BigInt, ethereum } from '@graphprotocol/graph-ts'
 
-import { Bundle, Pair, PairDayData, Token, TokenDayData, UniswapDayData, UniswapFactory } from '../types/schema'
+import { Bundle, Pair, PairDayData, Token, TokenDayData, PegasysDayData, PegasysFactory } from '../types/schema'
 import { PairHourData } from './../types/schema'
 import { FACTORY_ADDRESS, ONE_BI, ZERO_BD, ZERO_BI } from './helpers'
 
-export function updateUniswapDayData(event: ethereum.Event): UniswapDayData {
-  let uniswap = UniswapFactory.load(FACTORY_ADDRESS)!
+export function updatePegasysDayData(event: ethereum.Event): PegasysDayData {
+  let pegasys = PegasysFactory.load(FACTORY_ADDRESS)!
   let timestamp = event.block.timestamp.toI32()
   let dayID = timestamp / 86400
   let dayStartTimestamp = dayID * 86400
-  let uniswapDayData = UniswapDayData.load(dayID.toString())
-  if (uniswapDayData === null) {
-    uniswapDayData = new UniswapDayData(dayID.toString())
-    uniswapDayData.date = dayStartTimestamp
-    uniswapDayData.dailyVolumeUSD = ZERO_BD
-    uniswapDayData.dailyVolumeETH = ZERO_BD
-    uniswapDayData.totalVolumeUSD = ZERO_BD
-    uniswapDayData.totalVolumeETH = ZERO_BD
-    uniswapDayData.dailyVolumeUntracked = ZERO_BD
+  let pegasysDayData = PegasysDayData.load(dayID.toString())
+  if (pegasysDayData === null) {
+    pegasysDayData = new PegasysDayData(dayID.toString())
+    pegasysDayData.date = dayStartTimestamp
+    pegasysDayData.dailyVolumeUSD = ZERO_BD
+    pegasysDayData.dailyVolumeSYS = ZERO_BD
+    pegasysDayData.totalVolumeUSD = ZERO_BD
+    pegasysDayData.totalVolumeSYS = ZERO_BD
+    pegasysDayData.dailyVolumeUntracked = ZERO_BD
   }
 
-  uniswapDayData.totalLiquidityUSD = uniswap.totalLiquidityUSD
-  uniswapDayData.totalLiquidityETH = uniswap.totalLiquidityETH
-  uniswapDayData.txCount = uniswap.txCount
-  uniswapDayData.save()
+  pegasysDayData.totalLiquidityUSD = pegasys.totalLiquidityUSD
+  pegasysDayData.totalLiquiditySYS = pegasys.totalLiquiditySYS
+  pegasysDayData.txCount = pegasys.txCount
+  pegasysDayData.save()
 
-  return uniswapDayData as UniswapDayData
+  return pegasysDayData as PegasysDayData
 }
 
 export function updatePairDayData(event: ethereum.Event): PairDayData {
@@ -97,17 +97,17 @@ export function updateTokenDayData(token: Token, event: ethereum.Event): TokenDa
     tokenDayData = new TokenDayData(tokenDayID)
     tokenDayData.date = dayStartTimestamp
     tokenDayData.token = token.id
-    tokenDayData.priceUSD = token.derivedETH.times(bundle.ethPrice)
+    tokenDayData.priceUSD = token.derivedSYS.times(bundle.sysPrice)
     tokenDayData.dailyVolumeToken = ZERO_BD
-    tokenDayData.dailyVolumeETH = ZERO_BD
+    tokenDayData.dailyVolumeSYS = ZERO_BD
     tokenDayData.dailyVolumeUSD = ZERO_BD
     tokenDayData.dailyTxns = ZERO_BI
     tokenDayData.totalLiquidityUSD = ZERO_BD
   }
-  tokenDayData.priceUSD = token.derivedETH.times(bundle.ethPrice)
+  tokenDayData.priceUSD = token.derivedSYS.times(bundle.sysPrice)
   tokenDayData.totalLiquidityToken = token.totalLiquidity
-  tokenDayData.totalLiquidityETH = token.totalLiquidity.times(token.derivedETH as BigDecimal)
-  tokenDayData.totalLiquidityUSD = tokenDayData.totalLiquidityETH.times(bundle.ethPrice)
+  tokenDayData.totalLiquiditySYS = token.totalLiquidity.times(token.derivedSYS as BigDecimal)
+  tokenDayData.totalLiquidityUSD = tokenDayData.totalLiquiditySYS.times(bundle.sysPrice)
   tokenDayData.dailyTxns = tokenDayData.dailyTxns.plus(ONE_BI)
   tokenDayData.save()
 

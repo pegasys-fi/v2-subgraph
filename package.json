@@ -1,19 +1,17 @@
 {
-  "name": "uniswap-v2-subgraph",
+  "name": "pegasys-subgraph",
   "version": "1.0.0",
-  "repository": "https://github.com/graphprotocol/uniswap-v2-subgraph",
+  "repository": "https://github.com/graphprotocol/v2-subgraph",
   "license": "GPL-3.0-or-later",
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
-    "build": "run-s codegen && graph build",
-    "buildonly": "graph build",
-    "deploy:alchemy": "graph deploy --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz",
     "codegen": "graph codegen --output-dir src/types/",
-    "create-local": "graph create davekaj/uniswap --node http://127.0.0.1:8020",
-    "deploy-local": "graph deploy davekaj/uniswap --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
-    "deploy": "graph deploy ianlapham/uniswap-v2-dev --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
-    "deploy-staging": "graph deploy $THE_GRAPH_GITHUB_USER/$THE_GRAPH_SUBGRAPH_NAME /Uniswap --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/",
-    "watch-local": "graph deploy graphprotocol/Uniswap2 --watch --debug --node http://127.0.0.1:8020/ --ipfs http://localhost:5001"
+    "build": "graph build",
+    "create": "graph create pollum-io/pegasys --node  https://rollux.graph.pegasys.fi/deploy",
+    "deploy-local": "graph deploy pollum-io/pegasys --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
+    "watch-local": "graph deploy pollum-io/pegasys --watch --debug --node http://127.0.0.1:8020/ --ipfs http://localhost:5001",
+    "deploy": "graph deploy --node https://rollux.graph.pegasys.fi/deploy --ipfs https://rollux.ipfs.pegasys.fi/ pollum-io/pegasys",
+    "remove": "graph remove --node https://rollux.graph.pegasys.fi/deploy --ipfs https://rollux.ipfs.pegasys.fi/ pollum-io/pegasys"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.64.1",

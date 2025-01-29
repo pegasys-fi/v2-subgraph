@@ -9,7 +9,7 @@ import { Factory as FactoryContract } from '../types/templates/Pair/Factory'
 import { TokenDefinition } from './tokenDefinition'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
+export const FACTORY_ADDRESS = '0x302518cc2C03A8f4fD1C2c8AC1Ff4C195A1236Ca'
 
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -20,7 +20,7 @@ export let BI_18 = BigInt.fromI32(18)
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
 // rebass tokens, dont count in tracked volume
-export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
+export let UNTRACKED_PAIRS: string[]
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
   let bd = BigDecimal.fromString('1')
@@ -34,8 +34,8 @@ export function bigDecimalExp18(): BigDecimal {
   return BigDecimal.fromString('1000000000000000000')
 }
 
-export function convertEthToDecimal(eth: BigInt): BigDecimal {
-  return eth.toBigDecimal().div(exponentToBigDecimal(18))
+export function convertSysToDecimal(sys: BigInt): BigDecimal {
+  return sys.toBigDecimal().div(exponentToBigDecimal(18))
 }
 
 export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: BigInt): BigDecimal {
@@ -54,7 +54,7 @@ export function equalToZero(value: BigDecimal): boolean {
   return false
 }
 
-export function isNullEthValue(value: string): boolean {
+export function isNullSysValue(value: string): boolean {
   return value == '0x0000000000000000000000000000000000000000000000000000000000000001'
 }
 
@@ -75,7 +75,7 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
     let symbolResultBytes = contractSymbolBytes.try_symbol()
     if (!symbolResultBytes.reverted) {
       // for broken pairs that have no symbol function exposed
-      if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
+      if (!isNullSysValue(symbolResultBytes.value.toHexString())) {
         symbolValue = symbolResultBytes.value.toString()
       }
     }
@@ -103,7 +103,7 @@ export function fetchTokenName(tokenAddress: Address): string {
     let nameResultBytes = contractNameBytes.try_name()
     if (!nameResultBytes.reverted) {
       // for broken exchanges that have no name function exposed
-      if (!isNullEthValue(nameResultBytes.value.toHexString())) {
+      if (!isNullSysValue(nameResultBytes.value.toHexString())) {
         nameValue = nameResultBytes.value.toString()
       }
     }
@@ -114,14 +114,11 @@ export function fetchTokenName(tokenAddress: Address): string {
   return nameValue
 }
 
-// HOT FIX: we cant implement try catch for overflow catching so skip total supply parsing on these tokens that overflow
-// TODO: find better way to handle overflow
-let SKIP_TOTAL_SUPPLY: string[] = ['0x0000000000bf2686748e1c0255036e7617e7e8a5']
 
 export function fetchTokenTotalSupply(tokenAddress: Address): BigInt {
-  if (SKIP_TOTAL_SUPPLY.includes(tokenAddress.toHexString())) {
-    return BigInt.fromI32(0)
-  }
+  // if (SKIP_TOTAL_SUPPLY.includes(tokenAddress.toHexString())) {
+  //   return BigInt.fromI32(0)
+  // }
   const contract = ERC20.bind(tokenAddress)
   let totalSupplyValue = BigInt.zero()
   const totalSupplyResult = contract.try_totalSupply()
